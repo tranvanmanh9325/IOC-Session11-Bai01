@@ -1,6 +1,7 @@
 # [Bài tập] Caching danh mục thuốc (Redis Cache)
 
-Spring Boot REST API quản lý danh mục thuốc tích hợp **Redis Cache** theo **Cache-aside pattern** bằng annotation `@Cacheable`.
+Spring Boot REST API quản lý danh mục thuốc tích hợp **Redis Cache**
+theo **Cache-aside pattern** bằng annotation `@Cacheable`.
 
 ## Yêu cầu cài đặt
 
@@ -138,6 +139,6 @@ Client → GET /api/medicines/1
 
 | Annotation    | Khi nào dùng        | Hành vi                              |
 | ------------- | ------------------- | ------------------------------------ |
-| `@Cacheable`  | `getMedicineById`   | Đọc cache trước, nếu miss thì hit DB |
-| `@CachePut`   | `updateMedicine`    | Luôn hit DB và update cache          |
-| `@CacheEvict` | `deleteMedicine`    | Xóa entry khỏi cache                 |
+| `@Cacheable`  | `getMedicineById` | Đọc cache trước, nếu miss thì hit DB |
+| `@CachePut`   | `updateMedicine`  | Luôn hit DB và update cache          |
+| `@CacheEvict` | `deleteMedicine`  | Xóa entry khỏi cache                 |
