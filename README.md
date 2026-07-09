@@ -5,10 +5,10 @@ Spring Boot REST API quản lý danh mục thuốc tích hợp **Redis Cache** t
 ## Yêu cầu cài đặt
 
 | Công cụ | Phiên bản tối thiểu |
-|---------|-------------------|
-| Java    | 17+               |
-| Maven   | 3.8+              |
-| Docker  | 20+               |
+| ------- | ------------------- |
+| Java    | 17+                 |
+| Maven   | 3.8+                |
+| Docker  | 20+                 |
 
 ---
 
@@ -21,6 +21,7 @@ docker-compose up -d
 ```
 
 Lệnh này tạo:
+
 - `pharmacy-postgres` tại `localhost:5432` (DB: `pharmacy_db`)
 - `pharmacy-redis` tại `localhost:6379`
 
@@ -43,6 +44,7 @@ curl http://localhost:8080/api/medicines/1
 ```
 
 **Log console xuất hiện SQL:**
+
 ```sql
 >>> [DB HIT] Cache MISS - Fetching medicine id=1 from PostgreSQL...
 Hibernate:
@@ -71,18 +73,17 @@ docker exec -it pharmacy-redis redis-cli
 
 ## API Endpoints
 
-| Method   | URL                    | Mô tả                              | Cache              |
-|----------|------------------------|------------------------------------|--------------------|
-| `GET`    | `/api/medicines`       | Lấy tất cả thuốc                   | —                  |
-| `GET`    | `/api/medicines/{id}`  | Lấy chi tiết thuốc theo ID          | `@Cacheable`       |
-| `POST`   | `/api/medicines`       | Thêm thuốc mới                      | —                  |
-| `PUT`    | `/api/medicines/{id}`  | Cập nhật thuốc (refresh cache)      | `@CachePut`        |
-| `DELETE` | `/api/medicines/{id}`  | Xóa thuốc (evict cache)             | `@CacheEvict`      |
+| Method     | URL                    | Mô tả                              | Cache          |
+| ---------- | ---------------------- | ---------------------------------- | -------------- |
+| `GET`      | `/api/medicines`       | Lấy tất cả thuốc                   | —              |
+| `GET`      | `/api/medicines/{id}`  | Lấy chi tiết thuốc theo ID          | `@Cacheable`   |
+| `POST`     | `/api/medicines`       | Thêm thuốc mới                      | —              |
+| `PUT`      | `/api/medicines/{id}`  | Cập nhật thuốc (refresh cache)      | `@CachePut`    |
+| `DELETE`   | `/api/medicines/{id}`  | Xóa thuốc (evict cache)             | `@CacheEvict`  |
 
 ### Ví dụ tạo thuốc mới
 
 ```json
-POST /api/medicines
 {
   "name": "Aspirin 100mg",
   "category": "Tim mạch",
@@ -96,7 +97,7 @@ POST /api/medicines
 
 ## Cấu trúc dự án
 
-```
+```text
 src/main/java/com/example/pharmacy/
 ├── PharmacyApplication.java       # Entry point
 ├── config/
@@ -115,7 +116,7 @@ src/main/java/com/example/pharmacy/
 
 ## Cache Strategy
 
-```
+```text
 Client → GET /api/medicines/1
            │
            ▼
@@ -135,8 +136,8 @@ Client → GET /api/medicines/1
                Return Medicine
 ```
 
-| Annotation      | Khi nào dùng              | Hành vi                            |
-|-----------------|---------------------------|------------------------------------|
-| `@Cacheable`    | `getMedicineById`         | Đọc cache trước, nếu miss thì hit DB |
-| `@CachePut`     | `updateMedicine`          | Luôn hit DB và update cache          |
-| `@CacheEvict`   | `deleteMedicine`          | Xóa entry khỏi cache                 |
+| Annotation    | Khi nào dùng        | Hành vi                              |
+| ------------- | ------------------- | ------------------------------------ |
+| `@Cacheable`  | `getMedicineById`   | Đọc cache trước, nếu miss thì hit DB |
+| `@CachePut`   | `updateMedicine`    | Luôn hit DB và update cache          |
+| `@CacheEvict` | `deleteMedicine`    | Xóa entry khỏi cache                 |
