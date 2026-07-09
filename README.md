@@ -74,22 +74,22 @@ docker exec -it pharmacy-redis redis-cli
 
 ## API Endpoints
 
-| Method     | URL                    | Mô tả                              | Cache          |
-| ---------- | ---------------------- | ---------------------------------- | -------------- |
-| `GET`      | `/api/medicines`       | Lấy tất cả thuốc                   | —              |
-| `GET`      | `/api/medicines/{id}`  | Lấy chi tiết thuốc theo ID          | `@Cacheable`   |
-| `POST`     | `/api/medicines`       | Thêm thuốc mới                      | —              |
-| `PUT`      | `/api/medicines/{id}`  | Cập nhật thuốc (refresh cache)      | `@CachePut`    |
-| `DELETE`   | `/api/medicines/{id}`  | Xóa thuốc (evict cache)             | `@CacheEvict`  |
+| Method   | URL                   | Mo ta                           | Cache         |
+| -------- | --------------------- | ------------------------------- | ------------- |
+| GET      | /api/medicines        | Lay tat ca thuoc                | -             |
+| GET      | /api/medicines/{id}   | Lay chi tiet thuoc (co cache)   | @Cacheable    |
+| POST     | /api/medicines        | Them thuoc moi                  | -             |
+| PUT      | /api/medicines/{id}   | Cap nhat thuoc (refresh cache)  | @CachePut     |
+| DELETE   | /api/medicines/{id}   | Xoa thuoc (evict cache)         | @CacheEvict   |
 
 ### Ví dụ tạo thuốc mới
 
 ```json
 {
   "name": "Aspirin 100mg",
-  "category": "Tim mạch",
+  "category": "Tim mach",
   "price": 6000,
-  "description": "Chống đông máu, phòng ngừa nhồi máu cơ tim",
+  "description": "Chong dong mau, phong ngua nhoi mau co tim",
   "manufacturer": "Bayer"
 }
 ```
@@ -100,17 +100,17 @@ docker exec -it pharmacy-redis redis-cli
 
 ```text
 src/main/java/com/example/pharmacy/
-├── PharmacyApplication.java       # Entry point
+├── PharmacyApplication.java
 ├── config/
-│   └── RedisConfig.java           # Cấu hình RedisCacheManager (JSON, TTL 10 phút)
+│   └── RedisConfig.java
 ├── controller/
-│   └── MedicineController.java    # REST endpoints
+│   └── MedicineController.java
 ├── service/
-│   └── MedicineService.java       # Business logic + @Cacheable
+│   └── MedicineService.java
 ├── repository/
-│   └── MedicineRepository.java    # JPA Repository
+│   └── MedicineRepository.java
 └── model/
-    └── Medicine.java              # JPA Entity (implements Serializable)
+    └── Medicine.java
 ```
 
 ---
@@ -118,27 +118,28 @@ src/main/java/com/example/pharmacy/
 ## Cache Strategy
 
 ```text
-Client → GET /api/medicines/1
-           │
-           ▼
+Client -> GET /api/medicines/1
+           |
+           v
     Spring Cache Manager
-           │
-    ┌──────┴──────┐
-    │  Redis Hit? │
-    └──────┬──────┘
-        YES│                    NO
-           │              ┌────┴────┐
-           │              │  Query  │
-           │              │   DB    │
-           │              └────┬────┘
-           │                   │ Save to Redis
-           └──────────┬────────┘
-                      ▼
-               Return Medicine
+           |
+    +------+------+
+    |  Redis Hit? |
+    +------+------+
+        YES|             NO
+           |        +----+----+
+           |        |  Query  |
+           |        |   DB    |
+           |        +----+----+
+           |             | Save to Redis
+           +------+------+
+                  |
+                  v
+           Return Medicine
 ```
 
-| Annotation    | Khi nào dùng        | Hành vi                              |
-| ------------- | ------------------- | ------------------------------------ |
-| `@Cacheable`  | `getMedicineById` | Đọc cache trước, nếu miss thì hit DB |
-| `@CachePut`   | `updateMedicine`  | Luôn hit DB và update cache          |
-| `@CacheEvict` | `deleteMedicine`  | Xóa entry khỏi cache                 |
+| Annotation    | Khi nao dung      | Hanh vi                           |
+| ------------- | ----------------- | --------------------------------- |
+| @Cacheable    | getMedicineById   | Doc cache truoc, neu miss hit DB  |
+| @CachePut     | updateMedicine    | Luon hit DB va update cache       |
+| @CacheEvict   | deleteMedicine    | Xoa entry khoi cache              |
