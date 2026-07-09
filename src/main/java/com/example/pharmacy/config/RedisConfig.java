@@ -9,6 +9,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
 
@@ -16,15 +17,18 @@ import java.time.Duration;
 @EnableCaching
 public class RedisConfig {
 
+    /**
+     * Inject ObjectMapper được Spring Boot 4.x auto-configure với Jackson 3.
+     * Truyền vào GenericJacksonJsonRedisSerializer để serialize/deserialize cache entries dạng JSON.
+     */
     @Bean
-    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-        // Jackson 3 migration:
-        // - GenericJackson2JsonRedisSerializer (Jackson 2) → GenericJacksonJsonRedisSerializer (Jackson 3)
-        // - Bỏ ObjectMapper/LaissezFaireSubTypeValidator vì serializer tự quản lý type info (@class field)
-        GenericJacksonJsonRedisSerializer jsonSerializer = new GenericJacksonJsonRedisSerializer();
+    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory,
+                                          ObjectMapper objectMapper) {
+        GenericJacksonJsonRedisSerializer jsonSerializer =
+                new GenericJacksonJsonRedisSerializer(objectMapper);
 
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(10))       // TTL 10 phút
+                .entryTtl(Duration.ofMinutes(10))
                 .disableCachingNullValues()
                 .serializeKeysWith(
                         RedisSerializationContext.SerializationPair
